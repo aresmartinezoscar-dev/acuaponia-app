@@ -1,4 +1,8 @@
 {
+  "dir": "ltr",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "es",
   "name": "Acuaponía Monitor",
   "short_name": "Acuaponía",
   "description": "Monitoreo offline de sistemas de acuaponía",
@@ -6,7 +10,6 @@
   "display": "standalone",
   "background_color": "#ecfeff",
   "theme_color": "#06b6d4",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "assets/icon-192.png",
