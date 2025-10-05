@@ -62,6 +62,46 @@ body {
   display: none;
 }
 
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: linear-gradient(90deg, #1565c0, #2196f3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.app-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.app-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-left: 12px;
+  flex: 1;
+}
+
+.menu-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 22px;
+}
+
+main {
+  padding-top: 56px; /* igual a la altura del header */
+}
+
 /* ====== BANNER DE ALERTAS ====== */
 .alert-banner {
   position: sticky;
@@ -352,6 +392,7 @@ body {
   gap: 12px;
   margin-top: 24px;
 }
+
 
 .bottom-actions .btn-primary {
   flex: 1;
@@ -719,4 +760,5 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-secondary);
+
 }
