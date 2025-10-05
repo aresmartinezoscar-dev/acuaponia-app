@@ -2,7 +2,7 @@
   "name": "Acuaponía Monitor",
   "short_name": "Acuaponía",
   "description": "Monitoreo offline de sistemas de acuaponía",
-  "start_url": "./",
+  "start_url": "/acuaponia-app/public/",
   "scope": "/acuaponia-app/public/",
   "display": "standalone",
   "orientation": "portrait",
@@ -25,6 +25,7 @@
     }
   ]
 }
+
 
 
 
