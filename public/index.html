@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#06b6d4">
+    <meta name="description" content="Monitoreo de sistemas de acuaponía offline">
+    <title>Acuaponía Monitor</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="/src/css/styles.css">
+    <link rel="icon" type="image/png" href="assets/icon-192.png">
+</head>
+<body>
+    <!-- Banner de alertas -->
+    <div id="alert-banner" class="alert-banner hidden"></div>
+
+    <!-- Contenedor principal -->
+    <div id="app">
+        <!-- Vista de primer uso -->
+        <div id="first-run-view" class="view hidden">
+            <div class="welcome-container">
+                <div class="welcome-header">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                    </svg>
+                    <h1>Acuaponía</h1>
+                    <p class="subtitle">Monitoreo inteligente</p>
+                </div>
+                <form id="first-run-form" class="welcome-form">
+                    <div class="form-group">
+                        <label for="user-code">Código de usuario *</label>
+                        <input type="text" id="user-code" required placeholder="Ingresa tu código">
+                    </div>
+                    <div class="form-group">
+                        <label for="system-name">Nombre del sistema (opcional)</label>
+                        <input type="text" id="system-name" placeholder="Ej: Sistema Principal">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Comenzar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Vista Home -->
+        <div id="home-view" class="view hidden">
+            <div class="header">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                </svg>
+                <h1>Acuaponía</h1>
+                <p id="system-name-display" class="system-name"></p>
+            </div>
+
+            <div class="actions-grid">
+                <button class="action-card" data-view="add">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    <span>Añadir medición</span>
+                </button>
+                <button class="action-card" data-view="history">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>Ver histórico</span>
+                </button>
+            </div>
+
+            <div id="last-values-container" class="card hidden">
+                <h2 class="card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                    </svg>
+                    Últimos valores
+                </h2>
+                <div id="last-values-grid" class="values-grid"></div>
+            </div>
+
+            <div class="bottom-actions">
+                <button id="sync-button" class="btn btn-primary">
+                    <svg id="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                    <span id="sync-text">Sincronizar ahora</span>
+                </button>
+                <button class="btn btn-secondary" data-view="settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m-9-9h6m6 0h6"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Vista Añadir Medición -->
+        <div id="add-view" class="view hidden">
+            <div class="view-header">
+                <button class="btn-back" data-view="home">← Volver</button>
+                <h1>Añadir medición</h1>
+            </div>
+
+            <div class="measurements-container">
+                <!-- pH -->
+                <form class="measurement-form card" data-type="ph">
+                    <div class="form-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        <h3>pH</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <input type="number" step="0.1" min="0" max="14" required placeholder="Valor de pH">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- Temperatura -->
+                <form class="measurement-form card" data-type="temp">
+                    <div class="form-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                        </svg>
+                        <h3>Temperatura</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <input type="number" step="0.1" min="0" max="50" required placeholder="°C">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- Nivel de agua -->
+                <form class="measurement-form card" data-type="nivel">
+                    <div class="form-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        </svg>
+                        <h3>Nivel de agua</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <input type="number" step="1" min="0" max="100" required placeholder="cm">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- PPM -->
+                <form class="measurement-form card" data-type="ppm">
+                    <div class="form-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                        </svg>
+                        <h3>PPM</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <input type="number" step="1" min="0" max="2000" required placeholder="ppm">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- Comida -->
+                <form class="measurement-form card" data-type="comida">
+                    <div class="form-header">
+                        <span class="emoji-icon">🍽️</span>
+                        <h3>Comida administrada</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <input type="number" step="1" min="0" max="1000" required placeholder="Cantidad">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- Comentarios -->
+                <form id="comment-form" class="measurement-form card">
+                    <div class="form-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <h3>Añadir comentario</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <textarea rows="2" required placeholder="Escribe un comentario..."></textarea>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Vista Histórico -->
+        <div id="history-view" class="view hidden">
+            <div class="view-header">
+                <button class="btn-back" data-view="home">← Volver</button>
+                <h1>Histórico</h1>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-param="ph">pH</button>
+                <button class="tab" data-param="temp">Temp</button>
+                <button class="tab" data-param="nivel">Nivel</button>
+                <button class="tab" data-param="ppm">PPM</button>
+                <button class="tab" data-param="comida">Comida</button>
+            </div>
+
+            <div class="card">
+                <canvas id="chart-canvas"></canvas>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Registros recientes</h2>
+                <div id="measurements-list"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Comentarios</h2>
+                <div id="comments-list"></div>
+            </div>
+        </div>
+
+        <!-- Vista Ajustes -->
+        <div id="settings-view" class="view hidden">
+            <div class="view-header">
+                <button class="btn-back" data-view="home">← Volver</button>
+                <h1>Ajustes</h1>
+            </div>
+
+            <form id="settings-form">
+                <div class="card">
+                    <h3>Umbrales de pH</h3>
+                    <div class="settings-row">
+                        <label>pH Mínimo</label>
+                        <input type="number" step="0.1" name="umbralPhMin" required>
+                    </div>
+                    <div class="settings-row">
+                        <label>pH Máximo</label>
+                        <input type="number" step="0.1" name="umbralPhMax" required>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Umbrales de PPM</h3>
+                    <div class="settings-row">
+                        <label>PPM Mínimo</label>
+                        <input type="number" name="umbralPpmMin" required>
+                    </div>
+                    <div class="settings-row">
+                        <label>PPM Máximo</label>
+                        <input type="number" name="umbralPpmMax" required>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Nivel de agua (cm)</h3>
+                    <div class="settings-row">
+                        <label>Mínimo</label>
+                        <input type="number" name="minNivel" required>
+                    </div>
+                    <div class="settings-row">
+                        <label>Máximo</label>
+                        <input type="number" name="maxNivel" required>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Unidad de comida</h3>
+                    <select name="unidadComida">
+                        <option value="g">Gramos (g)</option>
+                        <option value="cucharadas">Cucharadas</option>
+                        <option value="ml">Mililitros (ml)</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <h3>Apariencia</h3>
+                    <label class="switch-label">
+                        <input type="checkbox" name="modoOscuro">
+                        <span>Modo oscuro</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </form>
+
+            <div class="card">
+                <h3>Información del usuario</h3>
+                <p id="user-info" class="user-info"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>

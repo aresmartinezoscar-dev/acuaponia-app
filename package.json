@@ -1,0 +1,22 @@
+{
+  "name": "acuaponia-app",
+  "version": "1.0.0",
+  "description": "App de monitoreo de acuaponía offline-first",
+  "main": "index.js",
+  "scripts": {
+    "dev": "python -m http.server 8080",
+    "build": "echo Build completo",
+    "capacitor:init": "npx cap init acuaponia com.acuaponia.app",
+    "capacitor:android": "npx cap add android",
+    "capacitor:sync": "npx cap sync",
+    "capacitor:open": "npx cap open android"
+  },
+  "keywords": ["acuaponia", "pwa", "offline"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0"
+  }
+}
