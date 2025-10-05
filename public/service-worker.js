@@ -1,16 +1,20 @@
-const CACHE_NAME = 'acuaponia-v1.0.0';
+const CACHE_NAME = 'acuaponia-v1.0.2';
+const BASE_PATH = '/acuaponia-app/public/';
 const urlsToCache = [
-  '/public/index.html',
-  '/public/src/css/styles.css',
-  '/public/src/js/main.js',
-  '/public/src/js/config.js',
-  '/public/src/js/db.js',
-  '/public/src/js/repo.js',
-  '/public/src/js/firebase-sync.js',
-  '/public/src/js/charts.js',
-  '/public/src/js/alerts.js',
-  '/public/src/js/ui.js',
-  '/public/src/js/util.js',
+  BASE_PATH,
+  BASE_PATH + 'index.html',
+  BASE_PATH + 'src/css/styles.css',
+  BASE_PATH + 'src/js/main.js',
+  BASE_PATH + 'src/js/config.js',
+  BASE_PATH + 'src/js/db.js',
+  BASE_PATH + 'src/js/repo.js',
+  BASE_PATH + 'src/js/firebase-sync.js',
+  BASE_PATH + 'src/js/charts.js',
+  BASE_PATH + 'src/js/alerts.js',
+  BASE_PATH + 'src/js/ui.js',
+  BASE_PATH + 'src/js/util.js',
+  BASE_PATH + 'assets/icon-192.png',
+  BASE_PATH + 'assets/icon-512.png',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
   'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js',
   'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js'
@@ -90,4 +94,5 @@ self.addEventListener('fetch', event => {
         });
       })
   );
+
 });
