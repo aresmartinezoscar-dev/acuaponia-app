@@ -4,7 +4,7 @@
   "description": "Monitoreo offline de sistemas de acuaponía",
   "start_url": "/acuaponia-app/public/",
   "scope": "/acuaponia-app/public/",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#ecfeff",
   "theme_color": "#06b6d4",
@@ -25,6 +25,7 @@
     }
   ]
 }
+
 
 
 
