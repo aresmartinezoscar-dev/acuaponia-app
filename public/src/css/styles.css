@@ -1,8 +1,10 @@
 /* ====== VARIABLES ====== */
 :root {
-  --color-primary: #06b6d4;
-  --color-primary-dark: #0891b2;
-  --color-secondary: #3b82f6;
+  :root {
+  --color-primary: #ff0050;
+  --color-primary-dark: #b30038;
+  --color-secondary: #ff80b0;
+
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
@@ -722,4 +724,5 @@ body {
   background: var(--color-text-secondary);
 
 }
+
 
