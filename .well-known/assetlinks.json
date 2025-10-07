@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "io.github.aresmartinezoscar_dev.twa",
+      "package_name": "com.acuaponia.app",
       "sha256_cert_fingerprints": [
         "EB:3E:BD:10:BB:3B:5E:18:16:09:6A:9A:E3:29:BB:68:D8:5A:12:F2:FB:1B:2F:A1:63:0E:AC:4B:52:1E:36:C1"
       ]
