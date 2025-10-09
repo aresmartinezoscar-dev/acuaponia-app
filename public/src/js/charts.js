@@ -73,7 +73,7 @@ export function renderChart(canvasId, measurements, tipo, config = {}) {
     options: {
       responsive: true,
       maintainAspectRatio: true,
-      aspectRatio: 2,
+      aspectRatio: 1.5,
       plugins: {
         legend: {
           display: true,
@@ -144,3 +144,4 @@ export function getCurrentChart() {
   return currentChart;
 
 }
+
