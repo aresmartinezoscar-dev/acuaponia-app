@@ -140,16 +140,58 @@
                     </div>
                 </form>
 
-                <!-- PPM -->
-                <form class="measurement-form card" data-type="ppm">
+                <!-- Conductividad Eléctrica -->
+                <form class="measurement-form card" data-type="conductividad">
                     <div class="form-header">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                         </svg>
-                        <h3>PPM</h3>
+                        <h3>C. Eléctrica</h3>
                     </div>
                     <div class="form-input-group">
-                        <input type="number" step="1" min="0" max="2000" required placeholder="ppm">
+                        <input type="number" step="0.01" min="0" max="10" required placeholder="S/m">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- Amonio -->
+                <form class="measurement-form card" data-type="amonio">
+                    <div class="form-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/>
+                        </svg>
+                        <h3>Amonio (NAT)</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <input type="number" step="0.01" min="0" max="10" required placeholder="mg/L">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- Nitrito -->
+                <form class="measurement-form card" data-type="nitrito">
+                    <div class="form-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M2 12h20"/>
+                        </svg>
+                        <h3>Nitrito (NO2)</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <input type="number" step="0.01" min="0" max="10" required placeholder="mg/L">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+
+                <!-- Nitrato -->
+                <form class="measurement-form card" data-type="nitrato">
+                    <div class="form-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+                        </svg>
+                        <h3>Nitrato (NO3)</h3>
+                    </div>
+                    <div class="form-input-group">
+                        <input type="number" step="0.1" min="0" max="200" required placeholder="mg/L">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
                 </form>
@@ -193,7 +235,10 @@
                 <button class="tab active" data-param="ph">pH</button>
                 <button class="tab" data-param="temp">Temp</button>
                 <button class="tab" data-param="nivel">Nivel</button>
-                <button class="tab" data-param="ppm">PPM</button>
+                <button class="tab" data-param="conductividad">Cond.</button>
+                <button class="tab" data-param="amonio">NAT</button>
+                <button class="tab" data-param="nitrito">NO2</button>
+                <button class="tab" data-param="nitrato">NO3</button>
                 <button class="tab" data-param="comida">Comida</button>
             </div>
 
@@ -233,14 +278,50 @@
                 </div>
 
                 <div class="card">
-                    <h3>Umbrales de PPM</h3>
+                    <h3>Umbrales de Conductividad</h3>
                     <div class="settings-row">
-                        <label>PPM Mínimo</label>
-                        <input type="number" name="umbralPpmMin" required>
+                        <label>Mínimo (S/m)</label>
+                        <input type="number" step="0.01" name="umbralCondMin" required>
                     </div>
                     <div class="settings-row">
-                        <label>PPM Máximo</label>
-                        <input type="number" name="umbralPpmMax" required>
+                        <label>Máximo (S/m)</label>
+                        <input type="number" step="0.01" name="umbralCondMax" required>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Umbrales de Amonio (NAT)</h3>
+                    <div class="settings-row">
+                        <label>Mínimo (mg/L)</label>
+                        <input type="number" step="0.01" name="umbralAmonioMin" required>
+                    </div>
+                    <div class="settings-row">
+                        <label>Máximo (mg/L)</label>
+                        <input type="number" step="0.01" name="umbralAmonioMax" required>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Umbrales de Nitrito (NO2)</h3>
+                    <div class="settings-row">
+                        <label>Mínimo (mg/L)</label>
+                        <input type="number" step="0.01" name="umbralNitritoMin" required>
+                    </div>
+                    <div class="settings-row">
+                        <label>Máximo (mg/L)</label>
+                        <input type="number" step="0.01" name="umbralNitritoMax" required>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Umbrales de Nitrato (NO3)</h3>
+                    <div class="settings-row">
+                        <label>Mínimo (mg/L)</label>
+                        <input type="number" step="0.1" name="umbralNitratoMin" required>
+                    </div>
+                    <div class="settings-row">
+                        <label>Máximo (mg/L)</label>
+                        <input type="number" step="0.1" name="umbralNitratoMax" required>
                     </div>
                 </div>
 
@@ -297,10 +378,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
