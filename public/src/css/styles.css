@@ -66,7 +66,7 @@ body {
 /* ====== BANNER DE ALERTAS ====== */
 .alert-banner {
   position: sticky;
-  top: 0px; /* Espacio para barra del sistema */
+  top: 20px; /* Espacio para barra del sistema */
   z-index: 1000;
   padding: 16px;
   padding-top: 20px; /* Padding adicional arriba */
@@ -725,6 +725,7 @@ body {
   background: var(--color-text-secondary);
 
 }
+
 
 
 
