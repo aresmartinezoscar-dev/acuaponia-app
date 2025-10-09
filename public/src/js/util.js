@@ -85,9 +85,9 @@ export function getParamUnit(tipo, config = {}) {
     temp: '°C',
     nivel: 'cm',
     conductividad: 'S/m',
-    amonio: 'mg/L',
-    nitrito: 'mg/L',
-    nitrato: 'mg/L',
+    amonio: 'ppm',
+    nitrito: 'ppm',
+    nitrato: 'ppm',
     comida: config.unidadComida || 'g'
   };
   return units[tipo] || '';
@@ -175,3 +175,4 @@ export function debounce(func, wait) {
   };
 
 }
+
