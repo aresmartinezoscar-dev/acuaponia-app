@@ -47,14 +47,14 @@ export function checkThreshold(tipo, valor, config) {
       if (valor >= config.umbralAmonioMax) {
         alert = {
           tipo,
-          mensaje: `⚠️ Amonio alto (${valor} mg/L)`,
+          mensaje: `⚠️ Amonio alto (${valor} ppm)`,
           valor,
           severity: 'danger'
         };
       } else if (valor >= config.umbralAmonioMax * 0.8) {
         alert = {
           tipo,
-          mensaje: `⚠️ Amonio elevado (${valor} mg/L)`,
+          mensaje: `⚠️ Amonio elevado (${valor} ppm)`,
           valor,
           severity: 'warning'
         };
@@ -65,14 +65,14 @@ export function checkThreshold(tipo, valor, config) {
       if (valor >= config.umbralNitritoMax) {
         alert = {
           tipo,
-          mensaje: `⚠️ Nitrito alto (${valor} mg/L)`,
+          mensaje: `⚠️ Nitrito alto (${valor} ppm)`,
           valor,
           severity: 'danger'
         };
       } else if (valor >= config.umbralNitritoMax * 0.8) {
         alert = {
           tipo,
-          mensaje: `⚠️ Nitrito elevado (${valor} mg/L)`,
+          mensaje: `⚠️ Nitrito elevado (${valor} ppm)`,
           valor,
           severity: 'warning'
         };
@@ -83,14 +83,14 @@ export function checkThreshold(tipo, valor, config) {
       if (valor <= config.umbralNitratoMin) {
         alert = {
           tipo,
-          mensaje: `⚠️ Nitrato muy bajo (${valor} mg/L)`,
+          mensaje: `⚠️ Nitrato muy bajo (${valor} ppm)`,
           valor,
           severity: 'warning'
         };
       } else if (valor >= config.umbralNitratoMax) {
         alert = {
           tipo,
-          mensaje: `⚠️ Nitrato alto (${valor} mg/L)`,
+          mensaje: `⚠️ Nitrato alto (${valor} ppm)`,
           valor,
           severity: 'danger'
         };
@@ -223,4 +223,5 @@ export function checkAlertResolution(tipo, valor, config) {
 // Obtener alerta activa
 export function getActiveAlert() {
   return activeAlert;
+
 }
