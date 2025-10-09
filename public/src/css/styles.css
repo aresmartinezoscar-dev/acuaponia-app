@@ -341,6 +341,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   padding: 8px 0;
+  margin-top: 30px; /* Añadido para bajar el botón */
   margin-bottom: 16px;
 }
 
@@ -723,5 +724,6 @@ body {
   background: var(--color-text-secondary);
 
 }
+
 
 
