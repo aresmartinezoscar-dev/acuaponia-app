@@ -99,11 +99,13 @@ export function renderChart(canvasId, measurements, tipo, config = {}) {
             display: false
           },
           ticks: {
-            maxRotation: 45,
-            minRotation: 45,
+            maxRotation: 0,
+            minRotation: 0,
             font: {
-              size: 10
-            }
+              size: 9
+            },
+            autoSkip: true,
+            maxTicksLimit: 6
           }
         },
         y: {
@@ -140,4 +142,5 @@ export function destroyChart() {
 // Obtener gráfica actual
 export function getCurrentChart() {
   return currentChart;
+
 }
