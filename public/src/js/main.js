@@ -76,4 +76,46 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
+
 }
+
+// ====== SCROLL AUTOMÁTICO AL ENFOCAR INPUTS ======
+
+function setupInputScrollBehavior() {
+    // Seleccionar todos los inputs y textareas
+    const inputs = document.querySelectorAll('input, textarea');
+    
+    inputs.forEach(input => {
+        input.addEventListener('focus', (e) => {
+            // Esperar un poco para que el teclado aparezca
+            setTimeout(() => {
+                // Calcular la posición del input
+                const inputRect = e.target.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                // Si el input está en la mitad inferior de la pantalla
+                if (inputRect.top > viewportHeight / 2) {
+                    // Scroll suave hacia el input con offset adicional
+                    e.target.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                }
+            }, 300); // 300ms para dar tiempo al teclado a aparecer
+        });
+    });
+}
+
+// Llamar la función al cargar
+setupInputScrollBehavior();
+
+// Re-aplicar cuando cambien de vista
+const observer = new MutationObserver(() => {
+    setupInputScrollBehavior();
+});
+
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
