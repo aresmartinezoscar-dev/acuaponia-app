@@ -17,16 +17,14 @@ export function formatDate(timestamp) {
   });
 }
 
-// Formatear fecha y hora
+// Formatear fecha y hora (formato compacto para gráficas)
 export function formatDateTime(timestamp) {
   const date = new Date(timestamp);
-  return date.toLocaleString('es-CO', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const day = date.getDate();
+  const month = date.toLocaleString('es-CO', { month: 'short' }).toUpperCase().slice(0, 3);
+  const hour = String(date.getHours()).padStart(2, '0');
+  const minute = String(date.getMinutes()).padStart(2, '0');
+  return `${day}/${month}\n${hour}:${minute}`;
 }
 
 // Formatear fecha ISO (YYYY-MM-DD)
@@ -175,4 +173,5 @@ export function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
+
 }
