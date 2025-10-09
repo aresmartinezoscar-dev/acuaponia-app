@@ -56,6 +56,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  padding-top: 60px; /* Espacio para barra del sistema */
 }
 
 .view.hidden {
@@ -722,4 +723,5 @@ body {
   background: var(--color-text-secondary);
 
 }
+
 
