@@ -592,6 +592,7 @@ body {
   align-items: center;
   gap: 12px;
   cursor: pointer;
+  margin-top: 12px; /* Espacio adicional arriba */
 }
 
 .switch-label input[type="checkbox"] {
@@ -725,6 +726,7 @@ body {
   background: var(--color-text-secondary);
 
 }
+
 
 
 
