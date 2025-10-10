@@ -26,8 +26,8 @@ export const defaultUserConfig = {
   unidadComida: 'g',
   umbralPhMin: 5.5,
   umbralPhMax: 8.0,
-  umbralCondMin: 0.05,
-  umbralCondMax: 3.0,
+  umbralCondMin: 0,
+  umbralCondMax: 600,
   umbralAmonioMin: 0,
   umbralAmonioMax: 1,
   umbralNitritoMin: 0,
@@ -39,3 +39,4 @@ export const defaultUserConfig = {
   modoOscuro: false
 
 };
+
