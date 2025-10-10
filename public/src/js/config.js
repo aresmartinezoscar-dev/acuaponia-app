@@ -29,12 +29,13 @@ export const defaultUserConfig = {
   umbralCondMin: 0.05,
   umbralCondMax: 3.0,
   umbralAmonioMin: 0,
-  umbralAmonioMax: 0.5,
+  umbralAmonioMax: 1,
   umbralNitritoMin: 0,
-  umbralNitritoMax: 0.2,
-  umbralNitratoMin: 5,
-  umbralNitratoMax: 150,
+  umbralNitritoMax: 1,
+  umbralNitratoMin: 0,
+  umbralNitratoMax: 160,
   minNivel: 10,
   maxNivel: 50,
   modoOscuro: false
+
 };
