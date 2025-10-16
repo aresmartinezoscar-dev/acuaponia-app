@@ -21,7 +21,7 @@ async function init() {
         // 4. Registrar Service Worker
         if ('serviceWorker' in navigator) {
             try {
-                const registration = await navigator.serviceWorker.register('/service-worker.js');
+                const registration = await navigator.serviceWorker.register('/acuaponia-app/public/service-worker.js');
                 console.log('✅ Service Worker registrado:', registration);
             } catch (error) {
                 console.warn('⚠️ Error al registrar Service Worker:', error);
@@ -145,6 +145,7 @@ observer.observe(document.body, {
     childList: true,
     subtree: true
 });
+
 
 
 
