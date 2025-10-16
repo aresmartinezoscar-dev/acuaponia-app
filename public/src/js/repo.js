@@ -153,4 +153,66 @@ export async function getMeasurementStats(tipo, days = 7) {
     avg: sum / values.length,
     latest: recent[recent.length - 1]
   };
+
+}
+
+// ====== IMPORTAR DATOS DESDE FIREBASE ======
+
+export async function importMeasurementsFromFirebase(firebaseMediciones) {
+  let imported = 0;
+  
+  for (const key in firebaseMediciones) {
+    const medicion = firebaseMediciones[key];
+    
+    // Guardar en IndexedDB sin añadir a sync_queue
+    const db = getDB();
+    await new Promise((resolve, reject) => {
+      const transaction = db.transaction(['mediciones'], 'readwrite');
+      const store = transaction.objectStore('mediciones');
+      const request = store.add({
+        tipo: medicion.tipo,
+        valor: medicion.valor,
+        unidad: medicion.unidad,
+        ts: medicion.ts,
+        tendencia: medicion.tendencia || 'same'
+      });
+      
+      request.onsuccess = () => {
+        imported++;
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+  
+  console.log(`📥 ${imported} mediciones importadas desde Firebase`);
+  return imported;
+}
+
+export async function importCommentsFromFirebase(firebaseComentarios) {
+  let imported = 0;
+  
+  for (const key in firebaseComentarios) {
+    const comentario = firebaseComentarios[key];
+    
+    const db = getDB();
+    await new Promise((resolve, reject) => {
+      const transaction = db.transaction(['comentarios'], 'readwrite');
+      const store = transaction.objectStore('comentarios');
+      const request = store.add({
+        texto: comentario.texto,
+        fechaISO: comentario.fechaISO,
+        ts: comentario.ts
+      });
+      
+      request.onsuccess = () => {
+        imported++;
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+  
+  console.log(`📥 ${imported} comentarios importados desde Firebase`);
+  return imported;
 }
