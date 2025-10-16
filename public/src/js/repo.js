@@ -1,5 +1,6 @@
 import { saveToStore, getFromStore, getAllFromStore, getByIndex, deleteFromStore, cleanOldRecords } from './db.js';
 import { defaultUserConfig } from './config.js';
+import { formatDateISO } from './util.js';
 
 // ====== CONFIGURACIÓN ======
 
@@ -158,61 +159,122 @@ export async function getMeasurementStats(tipo, days = 7) {
 
 // ====== IMPORTAR DATOS DESDE FIREBASE ======
 
+// ====== IMPORTAR DATOS DESDE FIREBASE ======
+
 export async function importMeasurementsFromFirebase(firebaseMediciones) {
+  if (!firebaseMediciones || typeof firebaseMediciones !== 'object') {
+    console.log('⚠️ No hay mediciones para importar');
+    return 0;
+  }
+
   let imported = 0;
+  const db = getDB();
+  
+  // Primero verificar cuántas mediciones ya existen
+  const existingMeasurements = await getAllFromStore('mediciones');
+  console.log(`📊 Mediciones existentes en local: ${existingMeasurements.length}`);
   
   for (const key in firebaseMediciones) {
     const medicion = firebaseMediciones[key];
     
-    // Guardar en IndexedDB sin añadir a sync_queue
-    const db = getDB();
-    await new Promise((resolve, reject) => {
-      const transaction = db.transaction(['mediciones'], 'readwrite');
-      const store = transaction.objectStore('mediciones');
-      const request = store.add({
-        tipo: medicion.tipo,
-        valor: medicion.valor,
-        unidad: medicion.unidad,
-        ts: medicion.ts,
-        tendencia: medicion.tendencia || 'same'
-      });
+    // Validar que tiene los campos necesarios
+    if (!medicion.tipo || medicion.valor === undefined || !medicion.ts) {
+      console.warn('⚠️ Medición inválida:', medicion);
+      continue;
+    }
+
+    try {
+      // Verificar si ya existe (por timestamp)
+      const exists = existingMeasurements.some(m => m.ts === medicion.ts && m.tipo === medicion.tipo);
       
-      request.onsuccess = () => {
-        imported++;
-        resolve();
-      };
-      request.onerror = () => reject(request.error);
-    });
+      if (exists) {
+        console.log(`⏭️ Medición ya existe: ${medicion.tipo} - ${medicion.ts}`);
+        continue;
+      }
+
+      // Guardar en IndexedDB sin añadir a sync_queue
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction(['mediciones'], 'readwrite');
+        const store = transaction.objectStore('mediciones');
+        const request = store.add({
+          tipo: medicion.tipo,
+          valor: medicion.valor,
+          unidad: medicion.unidad || '',
+          ts: medicion.ts,
+          tendencia: medicion.tendencia || 'same'
+        });
+        
+        request.onsuccess = () => {
+          imported++;
+          console.log(`✅ Importada medición ${imported}: ${medicion.tipo} = ${medicion.valor}`);
+          resolve();
+        };
+        request.onerror = () => {
+          console.error('❌ Error importando medición:', request.error);
+          reject(request.error);
+        };
+      });
+    } catch (error) {
+      console.error('❌ Error procesando medición:', error);
+    }
   }
   
-  console.log(`📥 ${imported} mediciones importadas desde Firebase`);
+  console.log(`📥 Total importadas: ${imported} mediciones desde Firebase`);
   return imported;
 }
 
 export async function importCommentsFromFirebase(firebaseComentarios) {
+  if (!firebaseComentarios || typeof firebaseComentarios !== 'object') {
+    console.log('⚠️ No hay comentarios para importar');
+    return 0;
+  }
+
   let imported = 0;
+  const db = getDB();
+  
+  const existingComments = await getAllFromStore('comentarios');
+  console.log(`💬 Comentarios existentes en local: ${existingComments.length}`);
   
   for (const key in firebaseComentarios) {
     const comentario = firebaseComentarios[key];
     
-    const db = getDB();
-    await new Promise((resolve, reject) => {
-      const transaction = db.transaction(['comentarios'], 'readwrite');
-      const store = transaction.objectStore('comentarios');
-      const request = store.add({
-        texto: comentario.texto,
-        fechaISO: comentario.fechaISO,
-        ts: comentario.ts
-      });
+    if (!comentario.texto || !comentario.ts) {
+      console.warn('⚠️ Comentario inválido:', comentario);
+      continue;
+    }
+
+    try {
+      const exists = existingComments.some(c => c.ts === comentario.ts);
       
-      request.onsuccess = () => {
-        imported++;
-        resolve();
-      };
-      request.onerror = () => reject(request.error);
-    });
+      if (exists) {
+        console.log(`⏭️ Comentario ya existe: ${comentario.ts}`);
+        continue;
+      }
+
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction(['comentarios'], 'readwrite');
+        const store = transaction.objectStore('comentarios');
+        const request = store.add({
+          texto: comentario.texto,
+          fechaISO: comentario.fechaISO || formatDateISO(comentario.ts),
+          ts: comentario.ts
+        });
+        
+        request.onsuccess = () => {
+          imported++;
+          console.log(`✅ Importado comentario ${imported}`);
+          resolve();
+        };
+        request.onerror = () => {
+          console.error('❌ Error importando comentario:', request.error);
+          reject(request.error);
+        };
+      });
+    } catch (error) {
+      console.error('❌ Error procesando comentario:', error);
+    }
   }
   
-  console.log(`📥 ${imported} comentarios importados desde Firebase`);
+  console.log(`📥 Total importados: ${imported} comentarios desde Firebase`);
   return imported;
 }
