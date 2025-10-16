@@ -486,6 +486,12 @@ function setupSettingsForm() {
         // Re-inicializar alarmas
         const { restartAlarmSystem } = await import('./alarms.js');
         await restartAlarmSystem();
+        // Registrar background sync
+        if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {
+          const registration = await navigator.serviceWorker.ready;
+          await registration.sync.register('check-alarms');
+          console.log('✅ Background sync registrado');
+        }
     });
 }
 
@@ -558,6 +564,7 @@ function showToast(message) {
     }, 3000);
 
 }
+
 
 
 
