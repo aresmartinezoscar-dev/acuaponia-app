@@ -1,9 +1,38 @@
 import { getConfig } from './repo.js';
 import { vibrate, playAlertSound } from './util.js';
 
+let wakeLock = null;
+
+// Solicitar mantener pantalla activa
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('🔆 Wake Lock activado - pantalla permanecerá activa');
+      
+      wakeLock.addEventListener('release', () => {
+        console.log('💤 Wake Lock liberado');
+      });
+      
+      return true;
+    }
+  } catch (err) {
+    console.warn('⚠️ No se pudo activar Wake Lock:', err);
+  }
+  return false;
+}
+
+// Liberar Wake Lock
+function releaseWakeLock() {
+  if (wakeLock !== null) {
+    wakeLock.release().then(() => {
+      wakeLock = null;
+    });
+  }
+}
+
 let alarmIntervals = [];
 
-// Inicializar sistema de alarmas
 // Inicializar sistema de alarmas
 export async function initAlarmSystem() {
   console.log('⏰ Iniciando sistema de alarmas...');
@@ -16,6 +45,21 @@ export async function initAlarmSystem() {
   
   if (!config.alarmasComida) return;
 
+  // Verificar si hay alarmas activas
+  const hasActiveAlarms = config.alarmasComida.some(a => a.activa);
+  
+  if (hasActiveAlarms) {
+    // Solicitar Wake Lock para mantener activo
+    await requestWakeLock();
+    
+    // Re-activar Wake Lock si se pierde
+    document.addEventListener('visibilitychange', async () => {
+      if (wakeLock !== null && document.visibilityState === 'visible') {
+        await requestWakeLock();
+      }
+    });
+  }
+
   // Notificar al Service Worker
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage({
@@ -24,10 +68,10 @@ export async function initAlarmSystem() {
     console.log('📤 Alarmas enviadas al Service Worker');
   }
 
-  // Verificar cada minuto si hay que activar alarmas (backup si SW falla)
+  // Verificar cada minuto (más agresivo para alarmas)
   const checkInterval = setInterval(() => {
     checkAlarms(config);
-  }, 60000);
+  }, 30000); // Cada 30 segundos para mayor precisión
 
   alarmIntervals.push(checkInterval);
 
