@@ -84,6 +84,15 @@ function setupFirstRunForm() {
     const { downloadFromFirebase } = await import('./firebase-sync.js');
     const firebaseData = await downloadFromFirebase(userCode);
     
+    // DEBUG: Ver qué datos llegan
+    console.log('🔍 Datos de Firebase:', firebaseData);
+    
+    if (firebaseData) {
+      console.log('📥 Usuario encontrado en Firebase');
+      console.log('  - Mediciones:', firebaseData.mediciones ? Object.keys(firebaseData.mediciones).length : 0);
+      console.log('  - Comentarios:', firebaseData.comentarios ? Object.keys(firebaseData.comentarios).length : 0);
+      console.log('  - Umbrales:', firebaseData.umbrales ? 'Sí' : 'No');
+    
     if (firebaseData) {
       console.log('📥 Usuario encontrado en Firebase, cargando datos...');
       
@@ -548,6 +557,7 @@ function showToast(message) {
   }, 3000);
 
 }
+
 
 
 
