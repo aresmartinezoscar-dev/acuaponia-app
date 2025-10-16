@@ -148,7 +148,8 @@ function setupFirstRunForm() {
             setupSettingsForm();
             setupSyncButton();
             applyTheme();
-        };
+        }
+    }
 }
 
 // ====== HOME ======
@@ -557,4 +558,5 @@ function showToast(message) {
     }, 3000);
 
 }
+
 
