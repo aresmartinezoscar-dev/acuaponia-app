@@ -96,3 +96,207 @@ self.addEventListener('fetch', event => {
   );
 
 });
+
+// ====== SISTEMA DE ALARMAS EN SEGUNDO PLANO ======
+
+// Programar alarmas cuando se activa el service worker
+self.addEventListener('activate', (event) => {
+  console.log('🔔 Service Worker activado - Programando alarmas');
+  event.waitUntil(scheduleAllAlarms());
+});
+
+// Escuchar mensajes desde la app principal
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'UPDATE_ALARMS') {
+    console.log('📲 Actualizando alarmas desde la app');
+    scheduleAllAlarms();
+  }
+});
+
+// Programar todas las alarmas
+async function scheduleAllAlarms() {
+  try {
+    // Cancelar alarmas anteriores
+    const registrations = await self.registration.getNotifications();
+    registrations.forEach(notification => notification.close());
+
+    // Leer configuración desde IndexedDB
+    const config = await getConfigFromDB();
+    
+    if (!config || !config.alarmasComida) {
+      console.log('⚠️ No hay alarmas configuradas');
+      return;
+    }
+
+    // Programar cada alarma activa
+    config.alarmasComida.forEach((alarma, index) => {
+      if (alarma.activa) {
+        scheduleAlarm(alarma, index + 1);
+      }
+    });
+
+    console.log('✅ Alarmas programadas correctamente');
+  } catch (error) {
+    console.error('❌ Error al programar alarmas:', error);
+  }
+}
+
+// Programar una alarma específica
+function scheduleAlarm(alarma, numero) {
+  // Convertir hora de alarma a milisegundos
+  const [hora, periodo] = alarma.hora.split(' ');
+  const [h, m] = hora.split(':');
+  let hora24 = parseInt(h);
+  
+  if (periodo === 'PM' && hora24 !== 12) hora24 += 12;
+  if (periodo === 'AM' && hora24 === 12) hora24 = 0;
+
+  const ahora = new Date();
+  let alarmaTime = new Date();
+  alarmaTime.setHours(hora24, parseInt(m), 0, 0);
+
+  // Si la hora ya pasó hoy, programar para mañana
+  if (alarmaTime <= ahora) {
+    alarmaTime.setDate(alarmaTime.getDate() + 1);
+  }
+
+  const delay = alarmaTime.getTime() - ahora.getTime();
+
+  // Programar con setTimeout (para alarmas del mismo día)
+  if (delay < 24 * 60 * 60 * 1000) {
+    setTimeout(() => {
+      showAlarmNotification(numero, alarma.hora);
+      // Re-programar para el día siguiente
+      scheduleAlarm(alarma, numero);
+    }, delay);
+  }
+
+  console.log(`⏰ Alarma ${numero} programada para ${alarma.hora} (en ${Math.round(delay / 60000)} minutos)`);
+}
+
+// Mostrar notificación de alarma
+async function showAlarmNotification(numero, hora) {
+  const options = {
+    body: `🐟 Es hora de alimentar a los peces (${hora})`,
+    icon: '/acuaponia-app/public/assets/icon-192.png',
+    badge: '/acuaponia-app/public/assets/icon-192.png',
+    vibrate: [300, 100, 300, 100, 300, 100, 300],
+    tag: `alarma-comida-${numero}`,
+    requireInteraction: true,
+    silent: false,
+    actions: [
+      {
+        action: 'fed',
+        title: '✅ Ya alimenté',
+        icon: '/acuaponia-app/public/assets/icon-192.png'
+      },
+      {
+        action: 'snooze',
+        title: '⏰ Recordar en 5 min',
+        icon: '/acuaponia-app/public/assets/icon-192.png'
+      }
+    ],
+    data: {
+      numero: numero,
+      hora: hora,
+      timestamp: Date.now()
+    }
+  };
+
+  try {
+    await self.registration.showNotification('🔔 Alarma de Alimentación', options);
+    console.log(`🔔 Notificación de alarma ${numero} mostrada`);
+    
+    // Reproducir sonido (si es posible)
+    playNotificationSound();
+  } catch (error) {
+    console.error('❌ Error al mostrar notificación:', error);
+  }
+}
+
+// Manejar clics en las notificaciones
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'fed') {
+    console.log('✅ Usuario confirmó alimentación');
+    // Aquí podrías registrar automáticamente la alimentación
+    event.waitUntil(
+      clients.openWindow('/acuaponia-app/public/index.html')
+    );
+  } else if (event.action === 'snooze') {
+    console.log('⏰ Postponer alarma 5 minutos');
+    setTimeout(() => {
+      showAlarmNotification(event.notification.data.numero, event.notification.data.hora);
+    }, 5 * 60 * 1000); // 5 minutos
+  } else {
+    // Clic en la notificación (no en botones)
+    event.waitUntil(
+      clients.openWindow('/acuaponia-app/public/index.html')
+    );
+  }
+});
+
+// Leer configuración desde IndexedDB
+function getConfigFromDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('acuaponia_db', 1);
+
+    request.onerror = () => reject(request.error);
+
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction(['config'], 'readonly');
+      const store = transaction.objectStore('config');
+      const getRequest = store.get('singleton');
+
+      getRequest.onsuccess = () => resolve(getRequest.result);
+      getRequest.onerror = () => reject(getRequest.error);
+    };
+  });
+}
+
+// Reproducir sonido de notificación (experimental)
+function playNotificationSound() {
+  // El Service Worker tiene limitaciones de audio
+  // Esta función es más efectiva cuando la app está abierta
+  try {
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+      clients.forEach(client => {
+        client.postMessage({ type: 'PLAY_ALARM_SOUND' });
+      });
+    });
+  } catch (error) {
+    console.warn('⚠️ No se pudo reproducir sonido:', error);
+  }
+}
+
+// Verificación periódica de alarmas (backup)
+setInterval(() => {
+  checkAlarmsNow();
+}, 60000); // Cada minuto
+
+async function checkAlarmsNow() {
+  const config = await getConfigFromDB();
+  if (!config || !config.alarmasComida) return;
+
+  const ahora = new Date();
+  const horaActual = `${ahora.getHours()}:${String(ahora.getMinutes()).padStart(2, '0')}`;
+
+  config.alarmasComida.forEach((alarma, index) => {
+    if (!alarma.activa) return;
+
+    const [hora, periodo] = alarma.hora.split(' ');
+    const [h, m] = hora.split(':');
+    let hora24 = parseInt(h);
+    
+    if (periodo === 'PM' && hora24 !== 12) hora24 += 12;
+    if (periodo === 'AM' && hora24 === 12) hora24 = 0;
+    
+    const horaAlarma = `${hora24}:${m}`;
+
+    if (horaActual === horaAlarma) {
+      showAlarmNotification(index + 1, alarma.hora);
+    }
+  });
+}
