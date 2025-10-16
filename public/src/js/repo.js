@@ -1,4 +1,4 @@
-import { saveToStore, getFromStore, getAllFromStore, getByIndex, deleteFromStore, cleanOldRecords } from './db.js';
+import { saveToStore, getFromStore, getAllFromStore, getByIndex, deleteFromStore, cleanOldRecords, getDB } from './db.js';
 import { defaultUserConfig } from './config.js';
 import { formatDateISO } from './util.js';
 
@@ -278,3 +278,4 @@ export async function importCommentsFromFirebase(firebaseComentarios) {
   console.log(`📥 Total importados: ${imported} comentarios desde Firebase`);
   return imported;
 }
+
