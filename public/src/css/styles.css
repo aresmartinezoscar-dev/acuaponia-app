@@ -736,6 +736,33 @@ body {
 
 }
 
+/* Umbrales bloqueados */
+.card.locked {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.card.locked .settings-row input {
+  background: #e5e7eb;
+  cursor: not-allowed;
+}
+
+.unlock-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 10;
+  pointer-events: all;
+}
+
+.unlock-btn:hover {
+  transform: scale(1.1);
+}
 
 
 
