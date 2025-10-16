@@ -67,8 +67,8 @@ function triggerAlarm(numero) {
   // Vibrar
   vibrate([200, 100, 200, 100, 200, 100, 200]);
 
-  // Sonido
-  playAlertSound();
+  // Sonido personalizado
+  playCustomAlarmSound();
 
   // Notificación
   if ('Notification' in window && Notification.permission === 'granted') {
@@ -157,4 +157,21 @@ function showAlarmBanner(numero) {
 // Re-inicializar cuando cambie la config
 export async function restartAlarmSystem() {
   await initAlarmSystem();
+}
+
+// Reproducir sonido personalizado de alarma
+function playCustomAlarmSound() {
+  try {
+    const audio = new Audio('/acuaponia-app/public/src/assets/alarm.mp3');
+    audio.volume = 1.0; // Volumen máximo
+    audio.loop = false; // No repetir
+    audio.play().catch(error => {
+      console.warn('⚠️ No se pudo reproducir el sonido:', error);
+      // Fallback al sonido por defecto
+      playAlertSound();
+    });
+  } catch (error) {
+    console.warn('⚠️ Error al cargar audio personalizado:', error);
+    playAlertSound();
+  }
 }
