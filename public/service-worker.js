@@ -180,10 +180,12 @@ async function showAlarmNotification(numero, hora) {
     body: `🐟 Es hora de alimentar a los peces (${hora})`,
     icon: '/acuaponia-app/public/assets/icon-192.png',
     badge: '/acuaponia-app/public/assets/icon-192.png',
-    vibrate: [300, 100, 300, 100, 300, 100, 300],
-    tag: `alarma-comida-${numero}`,
+    vibrate: [500, 200, 500, 200, 500, 200, 500, 200, 500], // Vibración más larga
+    tag: `alarma-comida-${numero}-${Date.now()}`, // Tag único para evitar que se reemplace
     requireInteraction: true,
     silent: false,
+    renotify: true, // Re-notificar si ya existe
+    sticky: true, // Intenta mantenerla visible
     actions: [
       {
         action: 'fed',
@@ -199,16 +201,37 @@ async function showAlarmNotification(numero, hora) {
     data: {
       numero: numero,
       hora: hora,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      url: '/acuaponia-app/public/index.html'
     }
   };
 
   try {
-    await self.registration.showNotification('🔔 Alarma de Alimentación', options);
+    await self.registration.showNotification('🔔 ALARMA DE ALIMENTACIÓN', options);
     console.log(`🔔 Notificación de alarma ${numero} mostrada`);
     
-    // Reproducir sonido (si es posible)
+    // Reproducir sonido
     playNotificationSound();
+    
+    // Re-notificar cada 30 segundos durante 2 minutos si no se responde
+    let renotifyCount = 0;
+    const renotifyInterval = setInterval(async () => {
+      renotifyCount++;
+      if (renotifyCount > 4) { // Máximo 4 veces (2 minutos)
+        clearInterval(renotifyInterval);
+        return;
+      }
+      
+      // Volver a mostrar notificación
+      await self.registration.showNotification('🔔 ALARMA DE ALIMENTACIÓN', {
+        ...options,
+        tag: `alarma-comida-${numero}-${Date.now()}`,
+        body: `🐟 RECORDATORIO ${renotifyCount}: Es hora de alimentar (${hora})`
+      });
+      
+      console.log(`🔔 Re-notificación ${renotifyCount} de alarma ${numero}`);
+    }, 30000);
+    
   } catch (error) {
     console.error('❌ Error al mostrar notificación:', error);
   }
@@ -339,6 +362,7 @@ async function checkMissedAlarms() {
     }
   });
 }
+
 
 
 
