@@ -4,6 +4,7 @@ import { vibrate, playAlertSound } from './util.js';
 let alarmIntervals = [];
 
 // Inicializar sistema de alarmas
+// Inicializar sistema de alarmas
 export async function initAlarmSystem() {
   console.log('⏰ Iniciando sistema de alarmas...');
   
@@ -15,10 +16,18 @@ export async function initAlarmSystem() {
   
   if (!config.alarmasComida) return;
 
-  // Verificar cada minuto si hay que activar alarmas
+  // Notificar al Service Worker
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'UPDATE_ALARMS'
+    });
+    console.log('📤 Alarmas enviadas al Service Worker');
+  }
+
+  // Verificar cada minuto si hay que activar alarmas (backup si SW falla)
   const checkInterval = setInterval(() => {
     checkAlarms(config);
-  }, 60000); // Cada 60 segundos
+  }, 60000);
 
   alarmIntervals.push(checkInterval);
 
@@ -84,6 +93,16 @@ function triggerAlarm(numero) {
 
   // Alerta visual
   showAlarmBanner(numero);
+}
+
+// Escuchar mensajes del Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'PLAY_ALARM_SOUND') {
+      playAlertSound();
+      vibrate([300, 100, 300, 100, 300]);
+    }
+  });
 }
 
 // Mostrar banner de alarma
