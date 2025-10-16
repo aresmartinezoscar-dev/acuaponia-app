@@ -36,7 +36,13 @@ export const defaultUserConfig = {
   umbralNitratoMax: 160,
   minNivel: 10,
   maxNivel: 50,
-  modoOscuro: false
-
+  modoOscuro: false,
+  alarmasComida: [
+    { activa: false, hora: '7:45 AM' },
+    { activa: false, hora: '10:45 AM' },
+    { activa: false, hora: '1:45 PM' },
+    { activa: false, hora: '3:45 PM' }
+  ]
 };
+
 
