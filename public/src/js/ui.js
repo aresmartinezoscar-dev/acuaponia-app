@@ -77,17 +77,60 @@ function setupFirstRunForm() {
     // Recargar config
     config = await getConfig();
 
-    // Inicializar Firebase y sincronizar
+    // Inicializar Firebase
     initFirebase();
-    await syncAll(config);
-
-    // Descargar datos existentes de Firebase
+    
+    // Verificar si el usuario existe en Firebase y cargar datos
     const { downloadFromFirebase } = await import('./firebase-sync.js');
-    const firebaseData = await downloadFromFirebase(config.userCode);
-    if (firebaseData && firebaseData.mediciones) {
-    console.log('📥 Cargando datos existentes de Firebase...');
-    // Los datos ya están en Firebase, se sincronizarán automáticamente
+    const firebaseData = await downloadFromFirebase(userCode);
+    
+    if (firebaseData) {
+      console.log('📥 Usuario encontrado en Firebase, cargando datos...');
+      
+      // Importar mediciones
+      if (firebaseData.mediciones) {
+        const { importMeasurementsFromFirebase } = await import('./repo.js');
+        await importMeasurementsFromFirebase(firebaseData.mediciones);
+      }
+      
+      // Importar comentarios
+      if (firebaseData.comentarios) {
+        const { importCommentsFromFirebase } = await import('./repo.js');
+        await importCommentsFromFirebase(firebaseData.comentarios);
+      }
+      
+      // Cargar configuración de Firebase si existe
+      if (firebaseData.umbrales) {
+        await updateConfig({
+          umbralPhMin: firebaseData.umbrales.phMin,
+          umbralPhMax: firebaseData.umbrales.phMax,
+          umbralCondMin: firebaseData.umbrales.condMin,
+          umbralCondMax: firebaseData.umbrales.condMax,
+          umbralAmonioMin: firebaseData.umbrales.amonioMin || 0,
+          umbralAmonioMax: firebaseData.umbrales.amonioMax || 0.5,
+          umbralNitritoMin: firebaseData.umbrales.nitritoMin || 0,
+          umbralNitritoMax: firebaseData.umbrales.nitritoMax || 0.2,
+          umbralNitratoMin: firebaseData.umbrales.nitratoMin || 5,
+          umbralNitratoMax: firebaseData.umbrales.nitratoMax || 150
+        });
+      }
+      
+      if (firebaseData.nivel) {
+        await updateConfig({
+          minNivel: firebaseData.nivel.min,
+          maxNivel: firebaseData.nivel.max
+        });
+      }
+      
+      console.log('✅ Datos cargados desde Firebase');
+    } else {
+      console.log('👤 Usuario nuevo, creando en Firebase...');
+      await syncAll(config);
     }
+
+    // Recargar config
+    config = await getConfig();
+
     // Ir al home
     showView('home');
     await loadHomeView();
@@ -505,5 +548,6 @@ function showToast(message) {
   }, 3000);
 
 }
+
 
 
