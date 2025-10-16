@@ -31,6 +31,15 @@ async function init() {
         // 5. Detectar estado de conexión
         setupConnectionListeners();
 
+        // 6. Solicitar permisos de notificación
+        if ('Notification' in window && Notification.permission === 'default') {
+            await Notification.requestPermission();
+        }
+
+        // 7. Iniciar sistema de alarmas
+        const { initAlarmSystem } = await import('./alarms.js');
+        initAlarmSystem();
+
         console.log('✅ Aplicación lista');
     } catch (error) {
         console.error('❌ Error al inicializar la aplicación:', error);
@@ -50,6 +59,7 @@ function setupConnectionListeners() {
         showConnectionStatus('Sin conexión - Modo offline', 'warning');
     });
 }
+
 
 // Mostrar estado de conexión
 function showConnectionStatus(message, type) {
@@ -119,3 +129,4 @@ observer.observe(document.body, {
     childList: true,
     subtree: true
 });
+
