@@ -104,7 +104,7 @@ body {
 /* ====== BIENVENIDA ====== */
 .welcome-container {
   max-width: 500px;
-  margin: 60px auto;
+  margin: 100px auto 60px; /* Más margen arriba */
   background: var(--color-bg-secondary);
   padding: 40px;
   border-radius: var(--radius-lg);
@@ -372,6 +372,7 @@ body {
 
 /* ====== VISTA HEADER ====== */
 .view-header {
+  margin-top: 40px; /* Espacio arriba */
   margin-bottom: 24px;
 }
 
@@ -763,6 +764,7 @@ body {
 .unlock-btn:hover {
   transform: scale(1.1);
 }
+
 
 
 
