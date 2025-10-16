@@ -356,6 +356,20 @@ function loadSettingsView() {
   form.elements.unidadComida.value = config.unidadComida;
   form.elements.modoOscuro.checked = config.modoOscuro;
 
+  // Cargar alarmas
+  if (config.alarmasComida) {
+    config.alarmasComida.forEach((alarma, index) => {
+      const num = index + 1;
+      form.elements[`alarma${num}Activa`].checked = alarma.activa;
+      const [hora, periodo] = alarma.hora.split(' ');
+      const [h, m] = hora.split(':');
+      let hora24 = parseInt(h);
+      if (periodo === 'PM' && hora24 !== 12) hora24 += 12;
+      if (periodo === 'AM' && hora24 === 12) hora24 = 0;
+      form.elements[`alarma${num}Hora`].value = `${String(hora24).padStart(2, '0')}:${m}`;
+    });
+  }
+  
   // Mostrar información del usuario
   const userInfo = document.getElementById('user-info');
   userInfo.innerHTML = `
@@ -372,6 +386,20 @@ function setupSettingsForm() {
 
     const formData = new FormData(form);
 
+    const alarmasComida = [];
+    for (let i = 1; i <= 4; i++) {
+      const horaInput = formData.get(`alarma${i}Hora`);
+      const [h, m] = horaInput.split(':');
+      let hora12 = parseInt(h);
+      const periodo = hora12 >= 12 ? 'PM' : 'AM';
+      if (hora12 > 12) hora12 -= 12;
+      if (hora12 === 0) hora12 = 12;
+      alarmasComida.push({
+        activa: form.elements[`alarma${i}Activa`].checked,
+        hora: `${hora12}:${m} ${periodo}`
+      });
+    }
+    
     await updateConfig({
       umbralPhMin: parseFloat(formData.get('umbralPhMin')),
       umbralPhMax: parseFloat(formData.get('umbralPhMax')),
@@ -386,6 +414,7 @@ function setupSettingsForm() {
       minNivel: parseFloat(formData.get('minNivel')),
       maxNivel: parseFloat(formData.get('maxNivel')),
       unidadComida: formData.get('unidadComida'),
+      alarmasComida,
       modoOscuro: form.elements.modoOscuro.checked
     });
 
@@ -473,3 +502,4 @@ function showToast(message) {
   }, 3000);
 
 }
+
