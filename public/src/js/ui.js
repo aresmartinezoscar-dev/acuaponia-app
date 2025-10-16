@@ -81,6 +81,13 @@ function setupFirstRunForm() {
     initFirebase();
     await syncAll(config);
 
+    // Descargar datos existentes de Firebase
+    const { downloadFromFirebase } = await import('./firebase-sync.js');
+    const firebaseData = await downloadFromFirebase(config.userCode);
+    if (firebaseData && firebaseData.mediciones) {
+    console.log('📥 Cargando datos existentes de Firebase...');
+    // Los datos ya están en Firebase, se sincronizarán automáticamente
+    }
     // Ir al home
     showView('home');
     await loadHomeView();
@@ -464,4 +471,5 @@ function showToast(message) {
   setTimeout(() => {
     toast.classList.remove('show');
   }, 3000);
+
 }
