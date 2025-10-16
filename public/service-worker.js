@@ -300,3 +300,45 @@ async function checkAlarmsNow() {
     }
   });
 }
+
+// ====== BACKGROUND SYNC PARA ALARMAS ======
+
+// Registrar sincronización en segundo plano
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'check-alarms') {
+    console.log('🔄 Background sync: Verificando alarmas perdidas');
+    event.waitUntil(checkMissedAlarms());
+  }
+});
+
+// Verificar alarmas que pudieron haberse perdido
+async function checkMissedAlarms() {
+  const config = await getConfigFromDB();
+  if (!config || !config.alarmasComida) return;
+
+  const ahora = new Date();
+  const hace5Min = new Date(ahora.getTime() - 5 * 60000);
+
+  config.alarmasComida.forEach((alarma, index) => {
+    if (!alarma.activa) return;
+
+    const [hora, periodo] = alarma.hora.split(' ');
+    const [h, m] = hora.split(':');
+    let hora24 = parseInt(h);
+    
+    if (periodo === 'PM' && hora24 !== 12) hora24 += 12;
+    if (periodo === 'AM' && hora24 === 12) hora24 = 0;
+
+    // Verificar si la alarma debió sonar en los últimos 5 minutos
+    const alarmaTime = new Date();
+    alarmaTime.setHours(hora24, parseInt(m), 0, 0);
+
+    if (alarmaTime >= hace5Min && alarmaTime <= ahora) {
+      console.log(`🔔 Alarma ${index + 1} perdida - mostrando ahora`);
+      showAlarmNotification(index + 1, alarma.hora);
+    }
+  });
+}
+
+
+
