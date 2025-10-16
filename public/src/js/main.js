@@ -32,8 +32,23 @@ async function init() {
         setupConnectionListeners();
 
         // 6. Solicitar permisos de notificación
-        if ('Notification' in window && Notification.permission === 'default') {
-            await Notification.requestPermission();
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    console.log('✅ Permisos de notificación concedidos');
+                    // Mostrar notificación de prueba
+                    new Notification('🐟 Acuaponía', {
+                        body: 'Las alarmas están configuradas correctamente',
+                        icon: '/acuaponia-app/public/assets/icon-192.png',
+                        tag: 'welcome'
+                    });
+                }
+            } else if (Notification.permission === 'granted') {
+                console.log('✅ Permisos de notificación ya concedidos');
+            } else {
+                console.warn('⚠️ Permisos de notificación denegados');
+            }
         }
 
         // 7. Iniciar sistema de alarmas
@@ -130,6 +145,7 @@ observer.observe(document.body, {
     childList: true,
     subtree: true
 });
+
 
 
 
