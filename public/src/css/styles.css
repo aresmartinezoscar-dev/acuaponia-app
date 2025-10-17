@@ -764,12 +764,26 @@ body {
 .unlock-btn:hover {
   transform: scale(1.1);
 }
+/* Animaciones para banners */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
-
-
-
-
-
-
-
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
