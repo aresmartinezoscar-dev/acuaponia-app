@@ -28,13 +28,14 @@ async function init() {
 
         // 4. Registrar Service Worker
         if ('serviceWorker' in navigator) {
-            try {
-                const registration = await navigator.serviceWorker.register('/acuaponia-app/public/service-worker.js');
-                console.log('✅ Service Worker registrado:', registration);
-            } catch (error) {
-                console.warn('⚠️ Error al registrar Service Worker:', error);
-            }
+          navigator.serviceWorker.register('service-worker.js')
+            .then(async reg => {
+              console.log('Service Worker registrado ✅', reg);
+              await requestAllPermissionsFirst(); // 👈 LLAMADA AQUÍ
+            })
+            .catch(err => console.error('Error registrando SW:', err));
         }
+
 
         // 5. Detectar estado de conexión
         setupConnectionListeners();
@@ -121,112 +122,49 @@ function setupInputScrollBehavior() {
 }
 
 // Solicitar todos los permisos necesarios
-// Solicitar todos los permisos ANTES de inicializar la app
 async function requestAllPermissionsFirst() {
-    console.log('🔐 Solicitando permisos necesarios...');
-    
-    let allGranted = true;
+  console.log('🛂 Solicitando permisos de notificación...');
 
-    // ========== 1. NOTIFICACIONES (CRÍTICO) ==========
-    if ('Notification' in window) {
-        console.log('📱 Estado actual de notificaciones:', Notification.permission);
-        
-        if (Notification.permission === 'default') {
-            // Mostrar diálogo explicativo ANTES de pedir permiso
-            const userWantsPermissions = confirm(
-                '🐟 Acuaponía necesita permisos de notificación\n\n' +
-                '✅ Para enviarte alarmas de alimentación\n' +
-                '✅ Para alertas de parámetros fuera de rango\n' +
-                '✅ Para recordatorios importantes\n\n' +
-                '¿Permitir notificaciones?'
-            );
-            
-            if (!userWantsPermissions) {
-                alert('⚠️ Sin notificaciones, las alarmas NO funcionarán.\n\nPuedes activarlas después en Ajustes del navegador.');
-                allGranted = false;
-            } else {
-                // Pedir permiso
-                const permission = await Notification.requestPermission();
-                
-                if (permission === 'granted') {
-                    console.log('✅ Permiso de notificaciones CONCEDIDO');
-                    
-                    // Mostrar notificación de bienvenida
-                    try {
-                        new Notification('🐟 ¡Bienvenido a Acuaponía!', {
-                            body: 'Las notificaciones están activas. Las alarmas funcionarán correctamente.',
-                            icon: '/acuaponia-app/public/assets/icon-192.png',
-                            badge: '/acuaponia-app/public/assets/icon-192.png',
-                            tag: 'welcome',
-                            requireInteraction: false
-                        });
-                    } catch (e) {
-                        console.warn('No se pudo mostrar notificación de prueba:', e);
-                    }
-                } else if (permission === 'denied') {
-                    console.error('❌ Permiso de notificaciones DENEGADO');
-                    allGranted = false;
-                    
-                    alert(
-                        '❌ Has bloqueado las notificaciones\n\n' +
-                        'Para activar las alarmas:\n' +
-                        '1. Abre el menú del navegador (⋮)\n' +
-                        '2. Ve a "Configuración del sitio" o "Información"\n' +
-                        '3. Busca "Notificaciones"\n' +
-                        '4. Cambia a "Permitir"\n' +
-                        '5. Recarga la página'
-                    );
-                } else {
-                    console.warn('⚠️ Permiso de notificaciones no concedido');
-                    allGranted = false;
-                }
-            }
-        } else if (Notification.permission === 'granted') {
-            console.log('✅ Notificaciones ya permitidas');
-        } else if (Notification.permission === 'denied') {
-            console.error('❌ Notificaciones bloqueadas previamente');
-            allGranted = false;
-            
-            // Mostrar banner persistente
-            showPermissionsBanner();
-        }
+  if (!('Notification' in window)) {
+    console.warn('🚫 Este navegador no soporta notificaciones');
+    return false;
+  }
+
+  // Si ya tiene permiso concedido
+  if (Notification.permission === 'granted') {
+    console.log('✅ Notificaciones ya permitidas');
+    return true;
+  }
+
+  // Si están bloqueadas, no se puede pedir de nuevo
+  if (Notification.permission === 'denied') {
+    console.warn('❌ Notificaciones bloqueadas. El usuario debe reactivarlas manualmente.');
+    alert('Debes activar las notificaciones desde los ajustes del sistema o del navegador.');
+    return false;
+  }
+
+  // Solo si es "default", pedimos permiso
+  try {
+    const permission = await Notification.requestPermission();
+
+    if (permission === 'granted') {
+      console.log('✅ Permiso de notificaciones concedido');
+      new Notification('🐟 ¡Notificaciones activadas!', {
+        body: 'Las alarmas funcionarán incluso con la app cerrada.',
+        icon: '/acuaponia-app/public/assets/icon-192.png',
+        badge: '/acuaponia-app/public/assets/icon-192.png'
+      });
+      return true;
     } else {
-        console.error('❌ Este navegador no soporta notificaciones');
-        alert('⚠️ Tu navegador no soporta notificaciones.\n\nUsa Chrome, Firefox, Edge o Safari actualizado.');
-        allGranted = false;
+      console.warn('❌ El usuario no concedió permiso de notificación');
+      return false;
     }
-
-    // ========== 2. ALMACENAMIENTO PERSISTENTE ==========
-    if (navigator.storage && navigator.storage.persist) {
-        const isPersisted = await navigator.storage.persisted();
-        
-        if (!isPersisted) {
-            const granted = await navigator.storage.persist();
-            if (granted) {
-                console.log('✅ Almacenamiento persistente concedido');
-            } else {
-                console.warn('⚠️ Almacenamiento NO persistente');
-            }
-        } else {
-            console.log('✅ Almacenamiento ya es persistente');
-        }
-    }
-
-    // ========== 3. VERIFICAR SI ES PWA INSTALADA ==========
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
-                      || window.navigator.standalone 
-                      || document.referrer.includes('android-app://');
-    
-    if (!isStandalone) {
-        console.warn('⚠️ La app NO está instalada como PWA');
-        // Mostrar después de 3 segundos
-        setTimeout(showInstallBanner, 3000);
-    } else {
-        console.log('✅ App instalada como PWA');
-    }
-
-    return allGranted;
+  } catch (err) {
+    console.error('⚠️ Error al pedir permisos:', err);
+    return false;
+  }
 }
+
 
 // Mostrar banner para dar permisos manualmente
 function showPermissionsBanner() {
@@ -461,6 +399,7 @@ observer.observe(document.body, {
     childList: true,
     subtree: true
 });
+
 
 
 
