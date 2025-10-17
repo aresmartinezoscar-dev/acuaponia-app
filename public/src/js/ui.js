@@ -484,8 +484,8 @@ function setupSettingsForm() {
 
         showToast('✅ Ajustes guardados');
         // Re-inicializar alarmas
-        const { restartAlarmSystem } = await import('./alarms.js');
-        await restartAlarmSystem();
+        // const { restartAlarmSystem } = await import('./alarms.js');
+        // await restartAlarmSystem();
     });
 }
 
@@ -558,6 +558,7 @@ function showToast(message) {
     }, 3000);
 
 }
+
 
 
 
