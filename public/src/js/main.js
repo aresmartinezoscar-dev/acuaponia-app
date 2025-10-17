@@ -31,29 +31,29 @@ async function init() {
         // 5. Detectar estado de conexión
         setupConnectionListeners();
 
-        // 6. Solicitar permisos de notificación
-        if ('Notification' in window) {
-            if (Notification.permission === 'default') {
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    console.log('✅ Permisos de notificación concedidos');
-                    // Mostrar notificación de prueba
-                    new Notification('🐟 Acuaponía', {
-                        body: 'Las alarmas están configuradas correctamente',
-                        icon: '/acuaponia-app/public/assets/icon-192.png',
-                        tag: 'welcome'
-                    });
-                }
-            } else if (Notification.permission === 'granted') {
-                console.log('✅ Permisos de notificación ya concedidos');
-            } else {
-                console.warn('⚠️ Permisos de notificación denegados');
-            }
-        }
+        // // 6. Solicitar permisos de notificación
+        // if ('Notification' in window) {
+        //     if (Notification.permission === 'default') {
+        //         const permission = await Notification.requestPermission();
+        //         if (permission === 'granted') {
+        //             console.log('✅ Permisos de notificación concedidos');
+        //             // Mostrar notificación de prueba
+        //             new Notification('🐟 Acuaponía', {
+        //                 body: 'Las alarmas están configuradas correctamente',
+        //                 icon: '/acuaponia-app/public/assets/icon-192.png',
+        //                 tag: 'welcome'
+        //             });
+        //         }
+        //     } else if (Notification.permission === 'granted') {
+        //         console.log('✅ Permisos de notificación ya concedidos');
+        //     } else {
+        //         console.warn('⚠️ Permisos de notificación denegados');
+        //     }
+        // }
 
-        // 7. Iniciar sistema de alarmas
-        const { initAlarmSystem } = await import('./alarms.js');
-        initAlarmSystem();
+        // // 7. Iniciar sistema de alarmas
+        // const { initAlarmSystem } = await import('./alarms.js');
+        // initAlarmSystem();
 
 
         console.log('✅ Aplicación lista');
@@ -145,6 +145,7 @@ observer.observe(document.body, {
     childList: true,
     subtree: true
 });
+
 
 
 
