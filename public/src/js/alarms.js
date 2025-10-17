@@ -219,3 +219,37 @@ function playCustomAlarmSound() {
     playAlertSound();
   }
 }
+
+// Escuchar cuando el Service Worker dispara una alarma
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'ALARM_TRIGGERED') {
+      console.log(`🔔 Alarma ${event.data.numero} recibida desde Service Worker`);
+      
+      // Reproducir sonido personalizado
+      const audio = new Audio('/acuaponia-app/public/src/assets/alarm.mp3');
+      audio.volume = 1.0;
+      audio.loop = false;
+      
+      // Reproducir 3 veces
+      let playCount = 0;
+      const playSound = () => {
+        audio.play().catch(err => console.warn('Error reproduciendo:', err));
+        playCount++;
+      };
+      
+      playSound();
+      audio.addEventListener('ended', () => {
+        if (playCount < 3) {
+          setTimeout(playSound, 1000);
+        }
+      });
+      
+      // Vibrar
+      vibrate([500, 250, 500, 250, 500, 250, 500]);
+      
+      // Mostrar alerta visual
+      showAlarmBanner(event.data.numero);
+    }
+  });
+}
